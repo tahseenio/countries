@@ -1,25 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
 import { Country } from '../components/Country'
+import { useFetch } from '../hooks/useFetch';
 
 export const Landing = () => {
-  const [data, setData] = useState(null)
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data } = await axios.get('https://restcountries.com/v3.1/all')
-        console.log(data)
-        setData(data)
-      } catch (error) {
-        console.log("FAILED TO FETCH", error)
-      }
-    }
-    fetchData()
-  }, [])
+  const [searchText, setSearchText] = useState('')
+  const { data } = useFetch(`https://restcountries.com/v3.1/all`)
+
   return (
     <>
-      {data?.map(elem => (<Country key={elem.name.common} name={elem.name.common} image={elem.flags.png} population={elem.population} region={elem.region} capital={elem.capital} />))}
+      <input type="text" placeholder='Search Country' onChange={(e) => setSearchText(e.target.value)} />
+      <div>
+        {data?.filter(elem => elem.name.common.toLowerCase().includes(searchText)).map(elem => (<Country key={elem.name.common} name={elem.name.common} image={elem.flags.png} population={elem.population} region={elem.region} capital={elem.capital} />))}
+      </div>
     </>
   )
 }
